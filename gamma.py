@@ -216,11 +216,11 @@ class Layer:
 		self.M_Ese = material.M_Ese
 		self.X_Ese = material.X_Ese
 
-		#use it to get the d# values
+		"""use it to get the d# values
 		print('d1='+str(self.d1))
 		print('d2='+str(self.d2))
 		print('d3='+str(self.d3))
-		print('d4='+str(self.d4))
+		print('d4='+str(self.d4))"""
 		
 		#bond sp3s* parameters
 		self.bondpar_2= material.bondpar_2*(1- 2*(self.d2-material.d2)/material.d2)
@@ -420,7 +420,7 @@ class Stack:
 			)
 
 
-hetero = Stack([InSe(),InSe(),InSe()],InSe().a)
+hetero = Stack([GaSe(),GaSe(),GaSe()],GaSe().a)
 	
 lattice = hetero.lat
 
