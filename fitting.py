@@ -174,10 +174,10 @@ class fitting(PTMC):
 	X_Ese = -4.89
 	
 	#bond lenght
-	d1=0.2452239643457275
-	d2=0.23434374187696183
-	d3=0.37618898094
-	d4=0.3761889809399999
+	d1=0
+	d2=0
+	d3=0
+	d4=0
 
 	
 	#bond sp3s* parameters
@@ -187,13 +187,22 @@ class fitting(PTMC):
 	bondpar_4=np.array([-0.133,0.242, 0.330,-0.075, 0.488,-0.386,1.110])
 	bondpar_5=np.array([-0.05,0.051,0.483,-0.149,0.249,-0.010,-0.125])
 
-	def __init__(self,Xonsite,Monsite,par1,par2,par3,par4,par5):
-		
-		bondpar_1=par1
-		bondpar_2=par2
-		bondpar_3=par3
-		bondpar_4=par4
-		bondpar_5=par5
+	def __init__(self,Xonsite,Monsite,bond1,bond2,bond3,bond4,bond5,a,c,z1,z2):
+		self.a=a
+		self.c=c
+		self.z1=z1
+		self.z2=z2
+		self.M_Es = Monsite[0]
+		self.X_Es = Xonsite[0]
+		self.M_Ep = Monsite[1]
+		self.X_Ep = Xonsite[1]
+		self.M_Ese = Monsite[2]
+		self.X_Ese = Xonsite[2]
+		self.bondpar_1=bond1
+		self.bondpar_2=bond2
+		self.bondpar_3=bond3
+		self.bondpar_4=bond4
+		self.bondpar_5=bond5
 
 class Layer:
 	def __init__(self,material,a,parity,layerstart=0,strained=True):
@@ -280,7 +289,7 @@ class Stack:
 			c += i.c
 		return c
 	
-	def __init__(self,materiallist, a):
+	def __init__(self,materiallist, a,strained=True):
 		self.a = a
 		self.materiallist = materiallist
 		if len(materiallist) % 3 != 0:
@@ -296,7 +305,7 @@ class Stack:
 
 		index = 0
 		for material in self.materiallist:
-			self.layerlist.append(Layer(material,self.a,index,self.filled_c))
+			self.layerlist.append(Layer(material,self.a,index,self.filled_c,strained=strained))
 			self.filled_c += material.c
 			index += 1
 
@@ -458,6 +467,7 @@ class Stack:
 			)
 
 
+material = fitting()
 hetero = Stack([GaSe(),GaSe(),GaSe()],GaSe().a)
 	
 lattice = hetero.lat
@@ -484,20 +494,8 @@ plt.figure(figsize=(8, 2.3))
 
 #ldos_map = solver.calc_spatial_ldos(energy=-10.517, broadening=0.1)  # [eV]
 
-plt.subplot(141, title="GaSe structure")
 bands = solver.calc_bands(A,l,h,A,gamma,k,m,gamma)
 bands.plot(point_labels=["A","L","H","A",r"$\Gamma$", "K", "M", r"$\Gamma$"])
-#bands = solver.calc_bands(l,A,h,l,A,gamma)
-#bands.plot(point_labels=["L","A","H","L","A",r"$\Gamma$"])
-
-plt.subplot(142, title="xz")
-model.plot(axes="xz")
-
-plt.subplot(143, title="yz")
-model.plot(axes="yz")
-
-plt.subplot(144, title="xy")
-lattice.plot(axes="xy")
 
 plt.show()
 	
