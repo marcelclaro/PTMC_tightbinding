@@ -6,6 +6,10 @@ from scipy import integrate
 
 pb.pltutils.use_style()
 
+"""
+CAUTION: d# calculation changes with layer order PLEASE CORRECT IT!
+"""
+
 
 """Hopping projections
 """
@@ -350,7 +354,7 @@ class Stack:
 				([1, -1, 0], 'X2-'+str(index), 'X2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X2pos,layer.X2pos,[1,-1,0]))),
 			)
 
-hetero = Stack([GaSe(),GaSe(),GaSe(),GaSe(),InSe(),InSe(),InSe(),InSe()],0.385)
+hetero = Stack([GaSe(),GaSe(),GaSe(),GaSe()],0.385)
 	
 lattice = hetero.lat
 
@@ -378,7 +382,7 @@ bands = solver.calc_bands(k,gamma, m, gamma, apoint)
 bands.plot(point_labels=["K",r"$\Gamma$", "M", r"$\Gamma$","A"])
 
 plt.subplot(142, title="xz")
-ldos_map.plot(axes="yz")
+model.plot(axes="xz")
 
 plt.subplot(143, title="yz")
 model.plot(axes="yz")
