@@ -118,10 +118,10 @@ class InSe(PTMC):
 	X_Ese = -4.89
 
 	#bond lenght
-	d2=0.2802079999999998
-	d1=0.2641801360385246
-	d3=0.4
-	d4=0.4
+	d1=0.26580159178743173
+	d2=0.27881874425332515
+	d3=0.40231918225
+	d4=0.40231918224999996
 
 	
 	#bond sp3s* parameters
@@ -146,10 +146,10 @@ class GaSe(PTMC):
 	X_Ese = -4.89
 	
 	#bond lenght
-	d1=0.24512733336481016
-	d2=0.23434374187696155
-	d3=0.37599999999999995
-	d4=0.37599999999999995
+	d1=0.2452239643457275
+	d2=0.23434374187696183
+	d3=0.37618898094
+	d4=0.3761889809399999
 
 	
 	#bond sp3s* parameters
@@ -207,13 +207,20 @@ class Layer:
 		self.c = material.c
 		self.z1 = material.z1
 		self.z2 = material.z2
+		
 		#on-site therms
 		self.M_Es = material.M_Es
 		self.X_Es = material.X_Es
 		self.M_Ep = material.M_Ep
 		self.X_Ep = material.X_Ep 
 		self.M_Ese = material.M_Ese
-		self.X_Ese = material.X_Ese 
+		self.X_Ese = material.X_Ese
+
+		"""use it to get the d# values
+		print('d1='+str(self.d1))
+		print('d2='+str(self.d2))
+		print('d3='+str(self.d3))
+		print('d4='+str(self.d4))"""
 		
 		#bond sp3s* parameters
 		self.bondpar_2= material.bondpar_2*(1- 2*(self.d2-material.d2)/material.d2)
@@ -406,7 +413,7 @@ class Stack:
 			)
 
 
-hetero = Stack([GaSe(),GaSe(),GaSe()],0.376)
+hetero = Stack([GaSe(),GaSe(),GaSe()],GaSe().a)
 	
 lattice = hetero.lat
 
@@ -418,8 +425,8 @@ model = pb.Model(
 print(model.hamiltonian.todense().shape)
 solver = pb.solver.lapack(model)
 
-a = 0.3755
-c = 3*0.7876028792
+a = hetero.a
+c = hetero.c
 gamma = [0, 0, 0]
 k = [4*pi/(3*a),0,0]
 m = [pi/a,-pi/(sqrt(3)*a),0]
