@@ -6,6 +6,8 @@ from scipy import integrate
 import matplotlib.mlab as mlab
 import matplotlib.gridspec as gs
 import sys
+from lmfit import Parameters, minimize
+from lmfit.printfuncs import report_fit
 
 pb.pltutils.use_style()
 
@@ -163,49 +165,28 @@ class GaSe(PTMC):
 	bondpar_5=np.array([-0.05,0.051,0.483,-0.149,0.249,-0.010,-0.125])
 
 class fitting(PTMC):
-	#lattice
-	a = 0.37618898094
-	c = 0.7876028792
-	z1 = 3*0.068891933
-	z2 = 3*0.117076586
-	#on-site therms
-	M_Es = -12.63
-	X_Es = -22.60
-	M_Ep = -6.44
-	X_Ep = -12.30
-	M_Ese = -2.60
-	X_Ese = -4.89
-	
 	#bond lenght
 	d1=0
 	d2=0
 	d3=0
 	d4=0
 
-	
-	#bond sp3s* parameters
-	bondpar_1=np.array([-0.988,2.057,2.803,-0.533, 0.822,-0.333,2.253])
-	bondpar_2=np.array([-2.241,1.881,2.462,-1.013,0.0,-0.279,-0.240])
-	bondpar_3=np.array([-0.102,0.085,0.774,-0.115,0.561,0.007,0.415])
-	bondpar_4=np.array([-0.133,0.242, 0.330,-0.075, 0.488,-0.386,1.110])
-	bondpar_5=np.array([-0.05,0.051,0.483,-0.149,0.249,-0.010,-0.125])
-
-	def __init__(self,Xonsite,Monsite,bond1,bond2,bond3,bond4,bond5,a,c,z1,z2):
+	def __init__(self,pars,a,c,z1,z2):
 		self.a=a
 		self.c=c
 		self.z1=z1
 		self.z2=z2
-		self.M_Es = Monsite[0]
-		self.X_Es = Xonsite[0]
-		self.M_Ep = Monsite[1]
-		self.X_Ep = Xonsite[1]
-		self.M_Ese = Monsite[2]
-		self.X_Ese = Xonsite[2]
-		self.bondpar_1=bond1
-		self.bondpar_2=bond2
-		self.bondpar_3=bond3
-		self.bondpar_4=bond4
-		self.bondpar_5=bond5
+		self.M_Es = pars['M_Es']
+		self.X_Es = pars['X_Es']
+		self.M_Ep = pars['M_Ep']
+		self.X_Ep = pars['X_Ep']
+		self.M_Ese = pars['M_Ese']
+		self.X_Ese = pars['X_Ese']
+		self.bondpar_1=np.array([pars['one_ss'],pars['one_sp'],pars['one_pp_s'],pars['one_pp_p'],pars['one_sep'],pars['one_ses'],pars['one_sese']])
+		self.bondpar_2=np.array([pars['two_ss'],pars['two_sp'],pars['two_pp_s'],pars['two_pp_p'],pars['two_sep'],pars['two_ses'],pars['two_sese']])
+		self.bondpar_3=np.array([pars['three_ss'],pars['three_sp'],pars['three_pp_s'],pars['three_pp_p'],pars['three_sep'],pars['three_ses'],pars['three_sese']])
+		self.bondpar_4=np.array([pars['four_ss'],pars['four_sp'],pars['four_pp_s'],pars['four_pp_p'],pars['four_sep'],pars['four_ses'],pars['four_sese']])
+		self.bondpar_5=np.array([pars['five_ss'],pars['five_sp'],pars['five_pp_s'],pars['five_pp_p'],pars['five_sep'],pars['five_ses'],pars['five_sese']])
 
 class Layer:
 	def __init__(self,material,a,parity,layerstart=0,strained=True):
@@ -380,7 +361,7 @@ class Stack:
 				#Ga-Ga bond 2
 				([0, 0, 0], 'M1-'+str(index), 'M2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_2,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.M1pos,layer.M2pos,[0,0,0]))),
 
-				# Ga-Se Bond 1
+				# Ga_se Bond 1
 				([0, 0, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[0,0,0]))),
 				([0, -1, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[0,-1,0]))),
 				([-1, 0, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[-1,0,0]))),
@@ -396,7 +377,7 @@ class Stack:
 				([1, 0, 0], 'M2-'+str(index), 'M2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_3,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.M2pos,layer.M2pos,[1,0,0]))),		
 				([1, -1, 0], 'M2-'+str(index), 'M2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_3,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.M2pos,layer.M2pos,[1,-1,0]))),
 				
-				# Se-Se Bond 4
+				# Se_se Bond 4
 				([0, 1, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[0,1,0]))),
 				([1, 0, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[1,0,0]))),
 				([1, -1, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[1,-1,0]))),
@@ -409,7 +390,7 @@ class Stack:
 				#Metal-Metal Bond 2
 				([0, 0, 0], 'M1-'+str(index), 'M2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_2,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.M1pos,layer.M2pos,[0,0,0]))),
 											
-				# Se-Se Bond 4
+				# Se_se Bond 4
 				([0, 1, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[0,1,0]))),
 				([1, 0, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[1,0,0]))),
 				([1, -1, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[1,-1,0]))),
@@ -426,7 +407,7 @@ class Stack:
 				([1, -1, 0], 'M2-'+str(index), 'M2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_3,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.M2pos,layer.M2pos,[1,-1,0]))),
 
 
-				# Ga-Se Bond 1
+				# Ga_se Bond 1
 				([0, 0, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[0,0,0]))),
 				([0, -1, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[0,-1,0]))),
 				([-1, 0, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[-1,0,0]))),
@@ -441,7 +422,7 @@ class Stack:
 				([0, 0, 0], 'M1-'+str(index), 'M2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_2,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.M1pos,layer.M2pos,[0,0,0]))),
 				
 
-				# Ga-Se Bond 1
+				# Ga_se Bond 1
 				([0, 0, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[0,0,0]))),
 				([0, -1, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[0,-1,0]))),
 				([-1, 0, 0], 'X1-'+str(index), 'M1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_1,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.M1pos,[-1,0,0]))),
@@ -459,7 +440,7 @@ class Stack:
 				([1, -1, 0], 'M2-'+str(index), 'M2-'+str(index), sp3s_hoppingmatrix(layer.bondpar_3,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.M2pos,layer.M2pos,[1,-1,0]))),
 				
 									
-				# Se-Se Bond 4
+				# Se_se Bond 4
 				([0, 1, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[0,1,0]))),
 				([1, 0, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[1,0,0]))),
 				([1, -1, 0], 'X1-'+str(index), 'X1-'+str(index), sp3s_hoppingmatrix(layer.bondpar_4,angles(layer.a1l,layer.a2l,layer.a3l,[1,1,0],layer.X1pos,layer.X1pos,[1,-1,0]))),
@@ -480,15 +461,12 @@ def apply_scissor(band,last_valence,exp_gap):
 	return modified_band
 
 
-#material = fitting()
-hetero = Stack([GaSe(),GaSe(),GaSe()],GaSe().a)
-	
-lattice = hetero.lat
+def residuals(pars,dft,weight,a,c,z1,z2):
+	material = fitting(pars,a,c,z1,z2)
+	mat = Stack([material,material,material],a,strained=False)
+	lattice = mat.lat
 
-a = hetero.a
-c = hetero.c
-
-kpoints= np.array([[0.0000000000,0.0000000000,0.5000000000],
+	kpoints= np.array([[0.0000000000,0.0000000000,0.5000000000],
 			[0.0000000000,0.0185185185,0.5000000000],
 			[0.0000000000,0.0370370370,0.5000000000],
 			[0.0000000000,0.0555555556,0.5000000000],
@@ -648,19 +626,28 @@ kpoints= np.array([[0.0000000000,0.0000000000,0.5000000000],
 			[0.3333300000,0.3333300000,0.2500000000],
 			[0.3333300000,0.3333300000,0.1250000000],
 			[0.3333300000,0.3333300000,0.0000000000]])
-points_index = [0,27,42,73,76,103,118,149,154,159]
+	points_index = [0,27,42,73,76,103,118,149,154,159]
+	kpoints[:,0] *= pi*2/a
+	kpoints[:,1] *= pi*2/a
+	kpoints[:,2] *= pi*2/c
 
-kpoints[:,0] *= pi*2/a
-kpoints[:,1] *= pi*2/a
-kpoints[:,2] *= pi*2/c
+	#print(dft.shape)
 
-model = pb.Model(
-	lattice,
-	pb.translational_symmetry()
-	#pb.primitive(a1=3, a2=3,a3=1)
-)
-print(model.hamiltonian.todense().shape)
-solver = pb.solver.lapack(model)
+	model = pb.Model(lattice,
+		pb.translational_symmetry()
+		#pb.primitive(a1=3, a2=3,a3=1)
+	)
+	#print(model.hamiltonian.todense().shape)
+	solver = pb.solver.lapack(model)
+
+	modelbands = solver.calc_bands_withpoints(kpoints,points_index)
+	bandenergies = np.transpose(modelbands.energy)[:33,:]
+	#print(bandenergies.shape)
+
+
+	residuals = (bandenergies-dft)*weight
+	print(np.sum(residuals**2))
+	return residuals
 
 
 z = np.loadtxt("./QE_bands/GaSegamma.dat.gnu") #This loads the bandx.dat.gnu file
@@ -673,12 +660,255 @@ for i in range(bndl):
 
 sc_bands = apply_scissor(bands,56,2.0)
 
+params = Parameters()
+params.add('M_Es', value=-12.63, min=-30.0, max=0, vary = True, brute_step = 1)
+params.add('X_Es', value=-22.60, min=-40.0, max=0, vary = True, brute_step = 1)
+params.add('M_Ep', value=-6.44, min=-20.0, max=0, vary = True, brute_step = 1)
+params.add('X_Ep', value=-12.30, min=-30.0, max=0, vary = True, brute_step = 1)
+params.add('M_Ese', value=-2.60, min=-10.0, max=0, vary = True, brute_step = 1)
+params.add('X_Ese', value=-4.89, min=-10.0, max=0, vary = True, brute_step = 1)
+
+params.add('one_ss', value= -0.988, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('one_sp', value= 2.057, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('one_pp_s', value= 2.803, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('one_pp_p', value= -0.533, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('one_sep', value= 0.822, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('one_ses', value= -0.333, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('one_sese', value= 2.253, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+
+params.add('two_ss', value= -2.241, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('two_sp', value= 1.881, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('two_pp_s', value= 2.462, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('two_pp_p', value= -1.013, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('two_sep', value= 0.0, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('two_ses', value= -0.279, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('two_sese', value= -0.240, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+
+params.add('three_ss', value= -0.102, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('three_sp', value= 0.085, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('three_pp_s', value= 0.774, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('three_pp_p', value= -0.115, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('three_sep', value= 0.561, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('three_ses', value= 0.007, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('three_sese', value= 0.415, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+
+params.add('four_ss', value= -0.133, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('four_sp', value= 0.242, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('four_pp_s', value= 0.330, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('four_pp_p', value= -0.075, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('four_sep', value= 0.488, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('four_ses', value= -0.386, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('four_sese', value= 1.110, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+
+params.add('five_ss', value= -0.05, min=-4.0, max=4.0, vary = True, brute_step = 0.1 )
+params.add('five_sp', value= 0.051, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('five_pp_s', value= 0.483, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('five_pp_p', value= -0.149, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('five_sep', value= 0.249, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('five_ses', value= -0.010, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+params.add('five_sese', value= -0.125, min=-4.0, max=4.0, vary = True, brute_step = 0.1)
+
+kpoints= np.array([[0.0000000000,0.0000000000,0.5000000000],
+		[0.0000000000,0.0185185185,0.5000000000],
+		[0.0000000000,0.0370370370,0.5000000000],
+		[0.0000000000,0.0555555556,0.5000000000],
+		[0.0000000000,0.0740740741,0.5000000000],
+		[0.0000000000,0.0925925926,0.5000000000],
+		[0.0000000000,0.1111111111,0.5000000000],
+		[0.0000000000,0.1296296296,0.5000000000],
+		[0.0000000000,0.1481481481,0.5000000000],
+		[0.0000000000,0.1666666667,0.5000000000],
+		[0.0000000000,0.1851851852,0.5000000000],
+		[0.0000000000,0.2037037037,0.5000000000],
+		[0.0000000000,0.2222222222,0.5000000000],
+		[0.0000000000,0.2407407407,0.5000000000],
+		[0.0000000000,0.2592592593,0.5000000000],
+		[0.0000000000,0.2777777778,0.5000000000],
+		[0.0000000000,0.2962962963,0.5000000000],
+		[0.0000000000,0.3148148148,0.5000000000],
+		[0.0000000000,0.3333333333,0.5000000000],
+		[0.0000000000,0.3518518519,0.5000000000],
+		[0.0000000000,0.3703703704,0.5000000000],
+		[0.0000000000,0.3888888889,0.5000000000],
+		[0.0000000000,0.4074074074,0.5000000000],
+		[0.0000000000,0.4259259259,0.5000000000],
+		[0.0000000000,0.4444444444,0.5000000000],
+		[0.0000000000,0.4629629630,0.5000000000],
+		[0.0000000000,0.4814814815,0.5000000000],
+		[0.0000000000,0.5000000000,0.5000000000],
+		[0.0222220000,0.4888886667,0.5000000000],
+		[0.0444440000,0.4777773333,0.5000000000],
+		[0.0666660000,0.4666660000,0.5000000000],
+		[0.0888880000,0.4555546667,0.5000000000],
+		[0.1111100000,0.4444433333,0.5000000000],
+		[0.1333320000,0.4333320000,0.5000000000],
+		[0.1555540000,0.4222206667,0.5000000000],
+		[0.1777760000,0.4111093333,0.5000000000],
+		[0.1999980000,0.3999980000,0.5000000000],
+		[0.2222200000,0.3888866667,0.5000000000],
+		[0.2444420000,0.3777753333,0.5000000000],
+		[0.2666640000,0.3666640000,0.5000000000],
+		[0.2888860000,0.3555526667,0.5000000000],
+		[0.3111080000,0.3444413333,0.5000000000],
+		[0.3333300000,0.3333300000,0.5000000000],
+		[0.3225774194,0.3225774194,0.5000000000],
+		[0.3118248387,0.3118248387,0.5000000000],
+		[0.3010722581,0.3010722581,0.5000000000],
+		[0.2903196774,0.2903196774,0.5000000000],
+		[0.2795670968,0.2795670968,0.5000000000],
+		[0.2688145161,0.2688145161,0.5000000000],
+		[0.2580619355,0.2580619355,0.5000000000],
+		[0.2473093548,0.2473093548,0.5000000000],
+		[0.2365567742,0.2365567742,0.5000000000],
+		[0.2258041935,0.2258041935,0.5000000000],
+		[0.2150516129,0.2150516129,0.5000000000],
+		[0.2042990323,0.2042990323,0.5000000000],
+		[0.1935464516,0.1935464516,0.5000000000],
+		[0.1827938710,0.1827938710,0.5000000000],
+		[0.1720412903,0.1720412903,0.5000000000],
+		[0.1612887097,0.1612887097,0.5000000000],
+		[0.1505361290,0.1505361290,0.5000000000],
+		[0.1397835484,0.1397835484,0.5000000000],
+		[0.1290309677,0.1290309677,0.5000000000],
+		[0.1182783871,0.1182783871,0.5000000000],
+		[0.1075258065,0.1075258065,0.5000000000],
+		[0.0967732258,0.0967732258,0.5000000000],
+		[0.0860206452,0.0860206452,0.5000000000],
+		[0.0752680645,0.0752680645,0.5000000000],
+		[0.0645154839,0.0645154839,0.5000000000],
+		[0.0537629032,0.0537629032,0.5000000000],
+		[0.0430103226,0.0430103226,0.5000000000],
+		[0.0322577419,0.0322577419,0.5000000000],
+		[0.0215051613,0.0215051613,0.5000000000],
+		[0.0107525806,0.0107525806,0.5000000000],
+		[0.0000000000,0.0000000000,0.5000000000],
+		[0.0000000000,0.0000000000,0.3333333333],
+		[0.0000000000,0.0000000000,0.1666666667],
+		[0.0000000000,0.0000000000,0.0000000000],
+		[0.0000000000,0.0185185185,0.0000000000],
+		[0.0000000000,0.0370370370,0.0000000000],
+		[0.0000000000,0.0555555556,0.0000000000],
+		[0.0000000000,0.0740740741,0.0000000000],
+		[0.0000000000,0.0925925926,0.0000000000],
+		[0.0000000000,0.1111111111,0.0000000000],
+		[0.0000000000,0.1296296296,0.0000000000],
+		[0.0000000000,0.1481481481,0.0000000000],
+		[0.0000000000,0.1666666667,0.0000000000],
+		[0.0000000000,0.1851851852,0.0000000000],
+		[0.0000000000,0.2037037037,0.0000000000],
+		[0.0000000000,0.2222222222,0.0000000000],
+		[0.0000000000,0.2407407407,0.0000000000],
+		[0.0000000000,0.2592592593,0.0000000000],
+		[0.0000000000,0.2777777778,0.0000000000],
+		[0.0000000000,0.2962962963,0.0000000000],
+		[0.0000000000,0.3148148148,0.0000000000],
+		[0.0000000000,0.3333333333,0.0000000000],
+		[0.0000000000,0.3518518519,0.0000000000],
+		[0.0000000000,0.3703703704,0.0000000000],
+		[0.0000000000,0.3888888889,0.0000000000],
+		[0.0000000000,0.4074074074,0.0000000000],
+		[0.0000000000,0.4259259259,0.0000000000],
+		[0.0000000000,0.4444444444,0.0000000000],
+		[0.0000000000,0.4629629630,0.0000000000],
+		[0.0000000000,0.4814814815,0.0000000000],
+		[0.0000000000,0.5000000000,0.0000000000],
+		[0.0222220000,0.4888886667,0.0000000000],
+		[0.0444440000,0.4777773333,0.0000000000],
+		[0.0666660000,0.4666660000,0.0000000000],
+		[0.0888880000,0.4555546667,0.0000000000],
+		[0.1111100000,0.4444433333,0.0000000000],
+		[0.1333320000,0.4333320000,0.0000000000],
+		[0.1555540000,0.4222206667,0.0000000000],
+		[0.1777760000,0.4111093333,0.0000000000],
+		[0.1999980000,0.3999980000,0.0000000000],
+		[0.2222200000,0.3888866667,0.0000000000],
+		[0.2444420000,0.3777753333,0.0000000000],
+		[0.2666640000,0.3666640000,0.0000000000],
+		[0.2888860000,0.3555526667,0.0000000000],
+		[0.3111080000,0.3444413333,0.0000000000],
+		[0.3333300000,0.3333300000,0.0000000000],
+		[0.3225774194,0.3225774194,0.0000000000],
+		[0.3118248387,0.3118248387,0.0000000000],
+		[0.3010722581,0.3010722581,0.0000000000],
+		[0.2903196774,0.2903196774,0.0000000000],
+		[0.2795670968,0.2795670968,0.0000000000],
+		[0.2688145161,0.2688145161,0.0000000000],
+		[0.2580619355,0.2580619355,0.0000000000],
+		[0.2473093548,0.2473093548,0.0000000000],
+		[0.2365567742,0.2365567742,0.0000000000],
+		[0.2258041935,0.2258041935,0.0000000000],
+		[0.2150516129,0.2150516129,0.0000000000],
+		[0.2042990323,0.2042990323,0.0000000000],
+		[0.1935464516,0.1935464516,0.0000000000],
+		[0.1827938710,0.1827938710,0.0000000000],
+		[0.1720412903,0.1720412903,0.0000000000],
+		[0.1612887097,0.1612887097,0.0000000000],
+		[0.1505361290,0.1505361290,0.0000000000],
+		[0.1397835484,0.1397835484,0.0000000000],
+		[0.1290309677,0.1290309677,0.0000000000],
+		[0.1182783871,0.1182783871,0.0000000000],
+		[0.1075258065,0.1075258065,0.0000000000],
+		[0.0967732258,0.0967732258,0.0000000000],
+		[0.0860206452,0.0860206452,0.0000000000],
+		[0.0752680645,0.0752680645,0.0000000000],
+		[0.0645154839,0.0645154839,0.0000000000],
+		[0.0537629032,0.0537629032,0.0000000000],
+		[0.0430103226,0.0430103226,0.0000000000],
+		[0.0322577419,0.0322577419,0.0000000000],
+		[0.0215051613,0.0215051613,0.0000000000],
+		[0.0107525806,0.0107525806,0.0000000000],
+		[0.0000000000,0.0000000000,0.0000000000],
+		[0.0000000000,0.5000000000,0.5000000000],
+		[0.0000000000,0.5000000000,0.3750000000],
+		[0.0000000000,0.5000000000,0.2500000000],
+		[0.0000000000,0.5000000000,0.1250000000],
+		[0.0000000000,0.5000000000,0.0000000000],
+		[0.3333300000,0.3333300000,0.5000000000],
+		[0.3333300000,0.3333300000,0.3750000000],
+		[0.3333300000,0.3333300000,0.2500000000],
+		[0.3333300000,0.3333300000,0.1250000000],
+		[0.3333300000,0.3333300000,0.0000000000]])
+points_index = [0,27,42,73,76,103,118,149,150,154,155,159]
+
+gase_ref = GaSe()
+kpoints[:,0] *= pi*2/gase_ref.a
+kpoints[:,1] *= pi*2/gase_ref.a
+kpoints[:,2] *= pi*2/gase_ref.c
+
+weight=np.full((33,160),0.10)
+for special in points_index:
+	weight[:,special]=1.0
+weight[:,0]=5.0
+weight[:,73]=5.0		
+weight[22:32,:]*=4.0
+
+print(weight)
+
+out = minimize(residuals,params,args=(sc_bands[30:63,:]-17.6,weight,gase_ref.a,gase_ref.c,gase_ref.z1,gase_ref.z2),method='negel',max_nfev=1000)
+report_fit(out, show_correl=True, modelpars=params)
+
 fig, subplot = plt.subplots()
-for i in range(bndl): #Here we plots the bands
+for i in range(30,63): #Here we plots the bands
 	subplot.scatter(x,sc_bands[i,:]-17.6,s=1,color="red")
+
+material = fitting(out.params,gase_ref.a,gase_ref.c,gase_ref.z1,gase_ref.z2)
+mat = Stack([material,material,material],gase_ref.a,strained=False)
+lattice = mat.lat
+
+model = pb.Model(
+lattice,
+pb.translational_symmetry()
+#pb.primitive(a1=3, a2=3,a3=1)
+)
+print(model.hamiltonian.todense().shape)
+solver = pb.solver.lapack(model)
 
 modelbands = solver.calc_bands_withpoints(kpoints,points_index)
 bandenergies = np.transpose(modelbands.energy)
+print("TB:")
+print(bandenergies[:33,0])
+print("DFT:")
+print(sc_bands[30:63,0]-17.6)
 
 for i in range(model.hamiltonian.todense().shape[0]): #Here we plots the bands
 	subplot.plot(x,bandenergies[i],color="blue")
