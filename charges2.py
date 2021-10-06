@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from math import sqrt, pi, cos, sin
 from scipy import integrate
+from scipy.optimize import minimize as minimize_scipy
 import matplotlib.mlab as mlab
 import matplotlib.gridspec as gs
 import sys
@@ -20,6 +21,8 @@ TO DO:
 
 """
 
+eps0 = 8.854187E-12
+e_charge = 1.60217662E-19
 
 """Hopping projections
 """
@@ -114,7 +117,7 @@ class InSe(PTMC):
 	z1 = 3*0.060940054
 	z2 = 3*0.111797495
 
-	vbo = 0.9
+	vbo = 0.0
 	#on-site therms
 	M_Es = -10.6448985-vbo
 	X_Es = -20.9312344-vbo
@@ -129,7 +132,9 @@ class InSe(PTMC):
 	d3=0.40231918225
 	d4=0.40231918224999996
 
-	charge=1.4233315169265
+	charge=1.4632
+
+	eps = 7.63
 
 	#bond sp3s* parameters
 	bondpar_1=np.array([-0.93087028,2.17662119,1.93915036,-0.57577716,-0.10196477,-0.14880588,0.08525471])
@@ -159,7 +164,9 @@ class GaSe(PTMC):
 	d4=0.3761889809399999
 
 	#dipole charge
-	charge=1.3714979184061065
+	charge=1.3711
+
+	eps = 7.63
 	
 	#bond sp3s* parameters
 	bondpar_1=np.array([-1.05908662,2.47549236 ,2.16608104,-0.66687273 , -0.11141026 ,-0.15410760,0.03118546 ])
@@ -277,7 +284,7 @@ class Stack:
 			c += i.c
 		return c
 	
-	def __init__(self,materiallist, a,strained=True):
+	def __init__(self,materiallist, a,strained=True,potential=[]):
 		self.a = a
 		self.materiallist = materiallist
 		if len(materiallist) % 3 != 0:
@@ -285,20 +292,30 @@ class Stack:
 		self.c = self.calc_c(materiallist)
 		self.filled_c = 0
 		self.layerlist = []
+		self.potential = potential
 		self.a1l=np.array([a/2, (a/2) * sqrt(3),0])
 		self.a2l=np.array([-a/2, (a/2) * sqrt(3),0]) 
 		self.a3l=np.array([0,0,self.c])
 		
 		self.lat = pb.Lattice(a1=self.a1l.tolist(), a2=self.a2l.tolist(), a3=self.a3l.tolist())
 
+		self.planes = []
+		self.defaultcharge = []
+
+
 
 		for index,material in enumerate(self.materiallist):
 			self.layerlist.append(Layer(material,self.a,index,self.filled_c,strained=strained))
+			self.planes.extend([self.filled_c+material.z1,self.filled_c+material.z2,self.filled_c+material.c-material.z2,self.filled_c+material.c-material.z1])
+			self.defaultcharge.extend([-material.charge,+material.charge,+material.charge,-material.charge])
 			self.filled_c += material.c
 
 
 		for index,layer in enumerate(self.layerlist):
-			self.add_layer(layer,index)
+			if len(self.potential) != 0:
+				self.add_layer(layer,index,self.potential[index*4:index*4+4])
+			else:
+				self.add_layer(layer,index,[0,0,0,0])
 
 
 		
@@ -335,29 +352,29 @@ class Stack:
 		
 		
 		
-	def add_layer(self,layer,index):
+	def add_layer(self,layer,index,potential):
 
 		self.lat.add_sublattices(
-			('X1-'+str(index), layer.X1pos.tolist(), [[layer.X_Es,0,0,0,0],
-								[0,layer.X_Ep,0,0,0],
-								[0,0,layer.X_Ep,0,0],
-								[0,0,0,layer.X_Ep,0],
-								[0,0,0,0,layer.X_Ese]]),
-			('X2-'+str(index), layer.X2pos.tolist(), [[layer.X_Es,0,0,0,0],
-								[0,layer.X_Ep,0,0,0],
-								[0,0,layer.X_Ep,0,0],
-								[0,0,0,layer.X_Ep,0],
-								[0,0,0,0,layer.X_Ese]]),
-			('M1-'+str(index), layer.M1pos.tolist(), [[layer.M_Es,0,0,0,0],
-								[0,layer.M_Ep,0,0,0],
-								[0,0,layer.M_Ep,0,0],
-								[0,0,0,layer.M_Ep,0],
-								[0,0,0,0,layer.M_Ese]]),
-			('M2-'+str(index), layer.M2pos.tolist(), [[layer.M_Es,0,0,0,0],
-								[0,layer.M_Ep,0,0,0],
-								[0,0,layer.M_Ep,0,0],
-								[0,0,0,layer.M_Ep,0],
-								[0,0,0,0,layer.M_Ese]]),
+			('X1-'+str(index), layer.X1pos.tolist(), [[layer.X_Es+potential[0],0,0,0,0],
+								[0,layer.X_Ep+potential[0],0,0,0],
+								[0,0,layer.X_Ep+potential[0],0,0],
+								[0,0,0,layer.X_Ep+potential[0],0],
+								[0,0,0,0,layer.X_Ese+potential[0]]]),
+			('X2-'+str(index), layer.X2pos.tolist(), [[layer.X_Es+potential[1],0,0,0,0],
+								[0,layer.X_Ep+potential[1],0,0,0],
+								[0,0,layer.X_Ep+potential[1],0,0],
+								[0,0,0,layer.X_Ep+potential[1],0],
+								[0,0,0,0,layer.X_Ese+potential[1]]]),
+			('M1-'+str(index), layer.M1pos.tolist(), [[layer.M_Es+potential[2],0,0,0,0],
+								[0,layer.M_Ep+potential[2],0,0,0],
+								[0,0,layer.M_Ep+potential[2],0,0],
+								[0,0,0,layer.M_Ep+potential[2],0],
+								[0,0,0,0,layer.M_Ese+potential[2]]]),
+			('M2-'+str(index), layer.M2pos.tolist(), [[layer.M_Es+potential[3],0,0,0,0],
+								[0,layer.M_Ep+potential[3],0,0,0],
+								[0,0,layer.M_Ep+potential[3],0,0],
+								[0,0,0,layer.M_Ep+potential[3],0],
+								[0,0,0,0,layer.M_Ese+potential[3]]]),
 		)
 
 		if index % 3 == 0:
@@ -654,175 +671,76 @@ def residuals(pars,dft,weight,a,c,z1,z2):
 	print(np.sum(residuals**2))
 	return residuals
 
+def getCharges(model,stack,insidegap):
+	charges = []
+	kpm = pb.kpm(model,silent=True)
+	for n,layer in enumerate(stack.layerlist):
+		ldos = kpm.calc_ldos(energy=np.linspace(-30, insidegap, 4000), broadening=0.05,
+			position=[0, 0,0], sublattice="X1-"+str(n))
+		chargeX1=6-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
+		ldos = kpm.calc_ldos(energy=np.linspace(-30, insidegap, 4000), broadening=0.05,
+			position=[0, 0,0], sublattice="M1-"+str(n))
+		chargeM1=3-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
+		ldos = kpm.calc_ldos(energy=np.linspace(-30, insidegap, 4000), broadening=0.05,
+			position=[0, 0,0], sublattice="X2-"+str(n))
+		chargeX2=6-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
+		ldos = kpm.calc_ldos(energy=np.linspace(-30, insidegap, 4000), broadening=0.05,
+			position=[0, 0,0], sublattice="M2-"+str(n))
+		chargeM2=3-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)		
+		charges.extend([chargeX1,chargeM1,chargeM2,chargeX2])
+	
+	return np.array(charges)
 
-kpoints= np.array([[0.0000000000,0.0000000000,0.5000000000],
-		[0.0000000000,0.0185185185,0.5000000000],
-		[0.0000000000,0.0370370370,0.5000000000],
-		[0.0000000000,0.0555555556,0.5000000000],
-		[0.0000000000,0.0740740741,0.5000000000],
-		[0.0000000000,0.0925925926,0.5000000000],
-		[0.0000000000,0.1111111111,0.5000000000],
-		[0.0000000000,0.1296296296,0.5000000000],
-		[0.0000000000,0.1481481481,0.5000000000],
-		[0.0000000000,0.1666666667,0.5000000000],
-		[0.0000000000,0.1851851852,0.5000000000],
-		[0.0000000000,0.2037037037,0.5000000000],
-		[0.0000000000,0.2222222222,0.5000000000],
-		[0.0000000000,0.2407407407,0.5000000000],
-		[0.0000000000,0.2592592593,0.5000000000],
-		[0.0000000000,0.2777777778,0.5000000000],
-		[0.0000000000,0.2962962963,0.5000000000],
-		[0.0000000000,0.3148148148,0.5000000000],
-		[0.0000000000,0.3333333333,0.5000000000],
-		[0.0000000000,0.3518518519,0.5000000000],
-		[0.0000000000,0.3703703704,0.5000000000],
-		[0.0000000000,0.3888888889,0.5000000000],
-		[0.0000000000,0.4074074074,0.5000000000],
-		[0.0000000000,0.4259259259,0.5000000000],
-		[0.0000000000,0.4444444444,0.5000000000],
-		[0.0000000000,0.4629629630,0.5000000000],
-		[0.0000000000,0.4814814815,0.5000000000],
-		[0.0000000000,0.5000000000,0.5000000000],
-		[0.0222220000,0.4888886667,0.5000000000],
-		[0.0444440000,0.4777773333,0.5000000000],
-		[0.0666660000,0.4666660000,0.5000000000],
-		[0.0888880000,0.4555546667,0.5000000000],
-		[0.1111100000,0.4444433333,0.5000000000],
-		[0.1333320000,0.4333320000,0.5000000000],
-		[0.1555540000,0.4222206667,0.5000000000],
-		[0.1777760000,0.4111093333,0.5000000000],
-		[0.1999980000,0.3999980000,0.5000000000],
-		[0.2222200000,0.3888866667,0.5000000000],
-		[0.2444420000,0.3777753333,0.5000000000],
-		[0.2666640000,0.3666640000,0.5000000000],
-		[0.2888860000,0.3555526667,0.5000000000],
-		[0.3111080000,0.3444413333,0.5000000000],
-		[0.3333300000,0.3333300000,0.5000000000],
-		[0.3225774194,0.3225774194,0.5000000000],
-		[0.3118248387,0.3118248387,0.5000000000],
-		[0.3010722581,0.3010722581,0.5000000000],
-		[0.2903196774,0.2903196774,0.5000000000],
-		[0.2795670968,0.2795670968,0.5000000000],
-		[0.2688145161,0.2688145161,0.5000000000],
-		[0.2580619355,0.2580619355,0.5000000000],
-		[0.2473093548,0.2473093548,0.5000000000],
-		[0.2365567742,0.2365567742,0.5000000000],
-		[0.2258041935,0.2258041935,0.5000000000],
-		[0.2150516129,0.2150516129,0.5000000000],
-		[0.2042990323,0.2042990323,0.5000000000],
-		[0.1935464516,0.1935464516,0.5000000000],
-		[0.1827938710,0.1827938710,0.5000000000],
-		[0.1720412903,0.1720412903,0.5000000000],
-		[0.1612887097,0.1612887097,0.5000000000],
-		[0.1505361290,0.1505361290,0.5000000000],
-		[0.1397835484,0.1397835484,0.5000000000],
-		[0.1290309677,0.1290309677,0.5000000000],
-		[0.1182783871,0.1182783871,0.5000000000],
-		[0.1075258065,0.1075258065,0.5000000000],
-		[0.0967732258,0.0967732258,0.5000000000],
-		[0.0860206452,0.0860206452,0.5000000000],
-		[0.0752680645,0.0752680645,0.5000000000],
-		[0.0645154839,0.0645154839,0.5000000000],
-		[0.0537629032,0.0537629032,0.5000000000],
-		[0.0430103226,0.0430103226,0.5000000000],
-		[0.0322577419,0.0322577419,0.5000000000],
-		[0.0215051613,0.0215051613,0.5000000000],
-		[0.0107525806,0.0107525806,0.5000000000],
-		[0.0000000000,0.0000000000,0.5000000000],
-		[0.0000000000,0.0000000000,0.3333333333],
-		[0.0000000000,0.0000000000,0.1666666667],
-		[0.0000000000,0.0000000000,0.0000000000],
-		[0.0000000000,0.0185185185,0.0000000000],
-		[0.0000000000,0.0370370370,0.0000000000],
-		[0.0000000000,0.0555555556,0.0000000000],
-		[0.0000000000,0.0740740741,0.0000000000],
-		[0.0000000000,0.0925925926,0.0000000000],
-		[0.0000000000,0.1111111111,0.0000000000],
-		[0.0000000000,0.1296296296,0.0000000000],
-		[0.0000000000,0.1481481481,0.0000000000],
-		[0.0000000000,0.1666666667,0.0000000000],
-		[0.0000000000,0.1851851852,0.0000000000],
-		[0.0000000000,0.2037037037,0.0000000000],
-		[0.0000000000,0.2222222222,0.0000000000],
-		[0.0000000000,0.2407407407,0.0000000000],
-		[0.0000000000,0.2592592593,0.0000000000],
-		[0.0000000000,0.2777777778,0.0000000000],
-		[0.0000000000,0.2962962963,0.0000000000],
-		[0.0000000000,0.3148148148,0.0000000000],
-		[0.0000000000,0.3333333333,0.0000000000],
-		[0.0000000000,0.3518518519,0.0000000000],
-		[0.0000000000,0.3703703704,0.0000000000],
-		[0.0000000000,0.3888888889,0.0000000000],
-		[0.0000000000,0.4074074074,0.0000000000],
-		[0.0000000000,0.4259259259,0.0000000000],
-		[0.0000000000,0.4444444444,0.0000000000],
-		[0.0000000000,0.4629629630,0.0000000000],
-		[0.0000000000,0.4814814815,0.0000000000],
-		[0.0000000000,0.5000000000,0.0000000000],
-		[0.0222220000,0.4888886667,0.0000000000],
-		[0.0444440000,0.4777773333,0.0000000000],
-		[0.0666660000,0.4666660000,0.0000000000],
-		[0.0888880000,0.4555546667,0.0000000000],
-		[0.1111100000,0.4444433333,0.0000000000],
-		[0.1333320000,0.4333320000,0.0000000000],
-		[0.1555540000,0.4222206667,0.0000000000],
-		[0.1777760000,0.4111093333,0.0000000000],
-		[0.1999980000,0.3999980000,0.0000000000],
-		[0.2222200000,0.3888866667,0.0000000000],
-		[0.2444420000,0.3777753333,0.0000000000],
-		[0.2666640000,0.3666640000,0.0000000000],
-		[0.2888860000,0.3555526667,0.0000000000],
-		[0.3111080000,0.3444413333,0.0000000000],
-		[0.3333300000,0.3333300000,0.0000000000],
-		[0.3225774194,0.3225774194,0.0000000000],
-		[0.3118248387,0.3118248387,0.0000000000],
-		[0.3010722581,0.3010722581,0.0000000000],
-		[0.2903196774,0.2903196774,0.0000000000],
-		[0.2795670968,0.2795670968,0.0000000000],
-		[0.2688145161,0.2688145161,0.0000000000],
-		[0.2580619355,0.2580619355,0.0000000000],
-		[0.2473093548,0.2473093548,0.0000000000],
-		[0.2365567742,0.2365567742,0.0000000000],
-		[0.2258041935,0.2258041935,0.0000000000],
-		[0.2150516129,0.2150516129,0.0000000000],
-		[0.2042990323,0.2042990323,0.0000000000],
-		[0.1935464516,0.1935464516,0.0000000000],
-		[0.1827938710,0.1827938710,0.0000000000],
-		[0.1720412903,0.1720412903,0.0000000000],
-		[0.1612887097,0.1612887097,0.0000000000],
-		[0.1505361290,0.1505361290,0.0000000000],
-		[0.1397835484,0.1397835484,0.0000000000],
-		[0.1290309677,0.1290309677,0.0000000000],
-		[0.1182783871,0.1182783871,0.0000000000],
-		[0.1075258065,0.1075258065,0.0000000000],
-		[0.0967732258,0.0967732258,0.0000000000],
-		[0.0860206452,0.0860206452,0.0000000000],
-		[0.0752680645,0.0752680645,0.0000000000],
-		[0.0645154839,0.0645154839,0.0000000000],
-		[0.0537629032,0.0537629032,0.0000000000],
-		[0.0430103226,0.0430103226,0.0000000000],
-		[0.0322577419,0.0322577419,0.0000000000],
-		[0.0215051613,0.0215051613,0.0000000000],
-		[0.0107525806,0.0107525806,0.0000000000],
-		[0.0000000000,0.0000000000,0.0000000000],
-		[0.0000000000,0.5000000000,0.5000000000],
-		[0.0000000000,0.5000000000,0.3750000000],
-		[0.0000000000,0.5000000000,0.2500000000],
-		[0.0000000000,0.5000000000,0.1250000000],
-		[0.0000000000,0.5000000000,0.0000000000],
-		[0.3333300000,0.3333300000,0.5000000000],
-		[0.3333300000,0.3333300000,0.3750000000],
-		[0.3333300000,0.3333300000,0.2500000000],
-		[0.3333300000,0.3333300000,0.1250000000],
-		[0.3333300000,0.3333300000,0.0000000000]])
-points_index = [0,27,42,73,76,103,118,149,150,154,155,159]
+def getPotential(stack,excess_charges):
+	V = [0,]
+	for n in range(1,len(stack.layerlist)*4):
+		distancelist = -(np.array(stack.planes)-stack.planes[n])*1E-9
+		distancelist[n:] *= 0
+		distancelist *= excess_charges*e_charge/(7.36*eps0*(stack.a*1E-9)**2*sin(pi*30/180))
+		V.append(np.sum(distancelist))
+	return V
 
 
-mat = Stack([InSe(),InSe(),InSe(),InSe(),InSe(),InSe(),GaSe(),GaSe(),GaSe(),GaSe(),GaSe(),GaSe()],0.388,strained=False)
+def smooth(y):
+	box = np.ones(4)/4
+	y_smooth = np.convolve(y, box, mode='same')
+	return y_smooth
+
+def residuals_pot(potential,materiallist,a):
+	mat = Stack(materiallist,a,strained=False,potential=smooth(potential))
+	lattice = mat.lat
+
+	model = pb.Model(
+	lattice,
+	pb.translational_symmetry()
+	#pb.primitive(a1=3, a2=3,a3=1)
+	)
+
+	chargescalc = getCharges(model,mat,-10.76)
+	print(chargescalc)
+	print(potential)
+	excess_charge = np.abs(chargescalc)-np.abs(np.array(mat.defaultcharge))
+	print("chi**2="+str(np.sum(excess_charge**2)))
+	return np.sum(excess_charge**2)
+
+materials = [InSe(),InSe(),InSe(),GaSe(),GaSe(),GaSe()]
+potential = np.empty(len(materials)*4)
+potential[:] = 0
+potential[len(materials)*2:] = -0.01
+"""potential = smooth([ 7.36514306e-02,5.32729842e-02,1.22326952e-02,-8.19263627e-08
+,4.64836557e-02,4.39959444e-02,-2.50824516e-05,-1.44859592e-03
+,3.86739278e-02,7.05021736e-02,-8.75314708e-03,6.38281240e-03
+,-9.49207005e-02,-6.67744478e-02,-1.85111897e-02,-7.37129459e-03
+,-6.43758167e-02,-6.90653995e-02,-6.73317692e-03,-1.40206266e-03
+,-6.00071294e-02,-1.04571429e-01,2.03394645e-03,-1.36254221e-02])"""
+
+
+out = minimize_scipy(residuals_pot, potential, args=(materials,0.388), method='Powell',options={'maxiter':100, 'maxfev':100000, "disp":True})
+print(out.x)
+
+potential = out.x
+mat = Stack(materials,0.388,strained=False)
 lattice = mat.lat
-kpoints[:,0] *= pi*2/mat.a
-kpoints[:,1] *= pi*2/mat.a
-kpoints[:,2] *= pi*2/mat.c
 a=mat.a
 c=mat.c
 gamma = [0, 0, 0]
@@ -840,8 +758,11 @@ pb.translational_symmetry()
 print(model.hamiltonian.todense().shape)
 solver = pb.solver.lapack(model)
 
-plt.figure(figsize=(8, 2.3))
+plt.scatter(mat.planes,smooth(potential))
+plt.show()
 
+"""
+plt.figure(figsize=(8, 2.3))
 plt.subplot(131, title="band structure")
 bands = solver.calc_bands(A,l,h,A,gamma,k,m,gamma)
 bands.plot(point_labels=["A","L","H","A",r"$\Gamma$", "K", "M", r"$\Gamma$"])
@@ -853,25 +774,5 @@ ldos_map.plot(axes="yz")
 plt.subplot(133, title="Cond.")
 ldos_map = solver.calc_spatial_ldos(energy=-10.31, broadening=0.05)  # [eV]
 ldos_map.plot(axes="yz")
-
-"""plt.subplot(132, title="Val.")
-model.plot(axes="yx")
-
-plt.subplot(133, title="Cond.")
-model.plot(axes="yz")"""
-
-
-kpm = pb.kpm(model,silent=True)
-print("charges:")
-for n in range(len(mat.materiallist)):
-	ldos = kpm.calc_ldos(energy=np.linspace(-30, -10.7, 4000), broadening=0.05,
-		position=[0, 0,0], sublattice="X2-"+str(n))
-	chargeX=6-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
-	ldos = kpm.calc_ldos(energy=np.linspace(-30, -10.7, 4000), broadening=0.05,
-		position=[0, 0,0], sublattice="M2-"+str(n))
-	chargeM=3-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
-	print("layer "+str(n)+" -X1="+str(chargeX)+"  M1="+str(chargeM))
-	
-
 plt.show()	
-	
+"""	
