@@ -110,13 +110,21 @@ class Stack:
 		self.a1l=np.array([a/2, (a/2) * sqrt(3),0])
 		self.a2l=np.array([-a/2, (a/2) * sqrt(3),0]) 
 		self.a3l=np.array([0,0,self.c])
+		self.permittivity = 0
 		
 		self.lat = pb.Lattice(a1=self.a1l.tolist(), a2=self.a2l.tolist(), a3=self.a3l.tolist())
 
+		self.planes = []
+		self.defaultcharge = []
 
 		for index,material in enumerate(self.materiallist):
 			self.layerlist.append(Layer(material,self.a,index,self.filled_c,strained=strained))
+			self.planes.extend([self.filled_c+material.z1,self.filled_c+material.z2,self.filled_c+material.c-material.z2,self.filled_c+material.c-material.z1])
+			self.defaultcharge.extend([-material.charge,+material.charge,+material.charge,-material.charge])
 			self.filled_c += material.c
+			self.permittivity += material.permittivity
+
+		self.permittivity /= len(materiallist)
 
 
 		for index,layer in enumerate(self.layerlist):

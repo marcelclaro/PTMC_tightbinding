@@ -11,6 +11,7 @@ from lmfit.printfuncs import report_fit
 
 from PTMC_TB.gamma import Stack
 from PTMC_TB.materials import *
+from PTMC_TB.charge import getCharges, electricfield
 import PTMC_TB.fitting as fitting
 import PTMC_TB.QE_util as QE
 
@@ -61,8 +62,14 @@ def residuals(pars,dft,weight,a,c,z1,z2):
 kpoints = QE.get_fullband_kpoints()
 points_index = QE.fullband_index
 
+"""
+inse_ = GaSe(charge=1.4020)
+gase_ = InSe(charge=1.4274,vbo=-0.17)
+"""
+inse_ = InSe(vbo=-0.17)
+gase_ = GaSe()
 
-mat = Stack([InSe(),InSe(),InSe()],0.4,strained=False)
+mat = Stack([gase_,gase_,gase_,gase_,gase_,gase_,gase_,gase_,gase_,inse_,inse_,inse_,inse_,inse_,inse_,gase_,gase_,gase_,gase_,gase_,gase_,gase_,gase_,gase_],0.388,strained=False)
 lattice = mat.lat
 kpoints[:,0] *= pi*2/mat.a
 kpoints[:,1] *= pi*2/mat.a
@@ -91,31 +98,40 @@ bands = solver.calc_bands(A,l,h,A,gamma,k,m,gamma)
 bands.plot(point_labels=["A","L","H","A",r"$\Gamma$", "K", "M", r"$\Gamma$"])
 
 plt.subplot(132, title="Val.")
-ldos_map = solver.calc_spatial_ldos(energy=-11.43, broadening=0.05)  # [eV]
+ldos_map = solver.calc_spatial_ldos(energy=-11.42, broadening=0.05)  # [eV]
 ldos_map.plot(axes="yz")
 
 plt.subplot(133, title="Cond.")
-ldos_map = solver.calc_spatial_ldos(energy=-10.31, broadening=0.05)  # [eV]
+ldos_map = solver.calc_spatial_ldos(energy=-10.25, broadening=0.05)  # [eV]
 ldos_map.plot(axes="yz")
 
+plt.show()	
 """plt.subplot(132, title="Val.")
 model.plot(axes="yx")
 
 plt.subplot(133, title="Cond.")
 model.plot(axes="yz")"""
 
+charges = getCharges(model,mat,-10.9)
+print("Charges:")
+print(charges)
+print("net Charges:")
+print(charges-mat.defaultcharge)
+excesscharges = charges-mat.defaultcharge
 
-kpm = pb.kpm(model,silent=True)
-print("charges:")
-for n in range(len(mat.materiallist)):
-	ldos = kpm.calc_ldos(energy=np.linspace(-30, -10.7, 4000), broadening=0.05,
-		position=[0, 0,0], sublattice="X2-"+str(n))
-	chargeX=6-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
-	ldos = kpm.calc_ldos(energy=np.linspace(-30, -10.7, 4000), broadening=0.05,
-		position=[0, 0,0], sublattice="M2-"+str(n))
-	chargeM=3-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
-	print("layer "+str(n)+" -X1="+str(chargeX)+"  M1="+str(chargeM))
-	
+fig, subplot = plt.subplots()
+subplot.scatter(mat.planes,excesscharges,s=1,color="green")
+plt.show()
 
-plt.show()	
+print("Field:")
+pos = np.arange(0,c,0.01)
+field = electricfield(pos,mat,excesscharges)
+potential = np.cumsum(field*0.01e-9)
+
+fig, subplot = plt.subplots()
+subplot.scatter(pos,field,s=1,color="red")
+plt.show()
 	
+fig, subplot = plt.subplots()
+subplot.scatter(pos,potential,s=1,color="blue")
+plt.show()
