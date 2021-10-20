@@ -8,7 +8,11 @@ class material(PTMC):
 	d3=0
 	d4=0
 
+	
+
 	def __init__(self,pars,a,c,z1,z2):
+		self.charge = 0
+		self.permittivity = 0
 		self.a=a
 		self.c=c
 		self.z1=z1

@@ -71,7 +71,7 @@ class Layer:
 		self.M_Ese = material.M_Ese
 		self.X_Ese = material.X_Ese
 
-		"""use it to get the d# values
+		"""use it to get the d values
 		print('d1='+str(self.d1))
 		print('d2='+str(self.d2))
 		print('d3='+str(self.d3))
@@ -84,6 +84,12 @@ class Layer:
 			self.bondpar_1= material.bondpar_1*(1- 2*(self.d1-material.d1)/material.d1)
 			self.bondpar_4= material.bondpar_4*(1- 2*(self.d4-material.d4)/material.d4)
 			self.bondpar_5= material.bondpar_5
+			"""
+			self.bondpar_2= material.bondpar_2*(material.d2/self.d2)**2
+			self.bondpar_3= material.bondpar_3*(material.d3/self.d3)**2
+			self.bondpar_1= material.bondpar_1*(material.d1/self.d1)**2
+			self.bondpar_4= material.bondpar_4*(material.d4/self.d4)**2
+			self.bondpar_5= material.bondpar_5"""
 		else:
 			self.bondpar_2= material.bondpar_2
 			self.bondpar_3= material.bondpar_3
@@ -120,7 +126,7 @@ class Stack:
 		for index,material in enumerate(self.materiallist):
 			self.layerlist.append(Layer(material,self.a,index,self.filled_c,strained=strained))
 			self.planes.extend([self.filled_c+material.z1,self.filled_c+material.z2,self.filled_c+material.c-material.z2,self.filled_c+material.c-material.z1])
-			self.defaultcharge.extend([-material.charge,+material.charge,+material.charge,-material.charge])
+			self.defaultcharge.extend([-material.charge,material.charge,material.charge,-material.charge])
 			self.filled_c += material.c
 			self.permittivity += material.permittivity
 

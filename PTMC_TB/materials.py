@@ -12,7 +12,7 @@ class InSe(PTMC):
 	z2 = 3*0.111797495
 
 
-	vbo = -0.17
+	vbo = -0.10
 	align = -0.389
 	#on-site therms
 	M_Es = -8.25051791+align+vbo
@@ -38,9 +38,15 @@ class InSe(PTMC):
 	bondpar_4=np.array([-0.04216172,-0.30000933,0.47875544,-0.07658634, 0.82644271 ,0.47723517,0.18445480])
 	bondpar_5=np.array([0.14318449,-1.02159242,0.92629092 ,-0.19926596,0.32488433,-0.19256169,0.32491191])
 
-	def __init__(self, vbo = -0.17, charge = 1.473955):
+	def __init__(self, vbo = -0.10, charge = 1.473955):
 		self.vbo = vbo
 		self.charge = charge
+		self.M_Es = -8.25051791+self.align+vbo
+		self.X_Es = -21.7774272+self.align+vbo
+		self.M_Ep = -5.78718728+self.align+vbo
+		self.X_Ep = -13.2424346+self.align+vbo
+		self.M_Ese = -0.00177680+self.align+vbo
+		self.X_Ese = -7.82566784+self.align+vbo
 
 class GaSe(PTMC):
 	#lattice
@@ -62,9 +68,6 @@ class GaSe(PTMC):
 	d3=0.37618898094
 	d4=0.3761889809399999
 
-	#dipole charge
-	charge=1.37109
-
 	permittivity = 7.63 * 8.854187e-12
 	
 	#bond sp3s* parameters
@@ -78,3 +81,86 @@ class GaSe(PTMC):
 		self.vbo = vbo
 		self.charge = charge
 
+class GaS(PTMC):
+	#lattice
+	a = 0.35787065881
+	c = 0.735930452
+	z1 = 3*0.070283744
+	z2 = 3*0.115642587
+	
+	#on-site therms
+	align = -0.02
+	vbo = -0.47
+	M_Es = -8.27485297+align+vbo
+	X_Es = -21.2216967+align +vbo
+	M_Ep = -6.91032591+align +vbo
+	X_Ep = -13.6205020+align+vbo
+	M_Ese = -0.37864800+align +vbo
+	X_Ese = -2.0840e-04+align+vbo
+	
+	#bond lenght
+	d1=0.22960632000699166
+	d2=0.23434374187696183
+	d3=0.35787065881
+	d4=0.35787065881
+
+	permittivity = 7.63 * 8.854187e-12
+	
+	#bond sp3s* parameters
+	bondpar_1=np.array([-1.02436390,2.63710397 ,2.72339356,-0.63204644 , 0.46394986 ,-0.56904087,-0.38369435 ])
+	bondpar_2=np.array([-3.82367937 ,2.25737862,5.13232850,1.63559673,-1.09700106,2.59754309 ,-2.41098533])
+	bondpar_3=np.array([-0.47643468,-0.53400382,1.10929477,0.52673442,-0.41914212,-0.32337050,-0.84513423])
+	bondpar_4=np.array([-0.19278761,0.41032797, 0.50189261,-0.06950092,1.10037916 ,0.37129232,0.88703060])
+	bondpar_5=np.array([0.08160404,-0.89388693,  0.78971076 ,-0.13090671,-0.66583978,-1.17377742,-3.91834164])
+
+	def __init__(self, vbo = -0.47, charge = 1.3778):
+		self.vbo = vbo
+		self.charge = charge
+		self.M_Es = -8.27485297+self.align+vbo
+		self.X_Es = -21.2216967+self.align +vbo
+		self.M_Ep = -6.91032591+self.align +vbo
+		self.X_Ep = -13.6205020+self.align+vbo
+		self.M_Ese = -0.37864800+self.align +vbo
+		self.X_Ese = -2.0840e-04+self.align+vbo
+
+class GaTe(PTMC):
+	#lattice
+	a = 0.40676785939
+	c = 0.877720556
+	z1 = 3*0.068052439
+	z2 = 3*0.118158034
+	
+	#on-site therms
+	align = -1.7
+	vbo = 0.15
+	M_Es = -0.29459962+align+vbo
+	X_Es = -17.6615209+align +vbo
+	M_Ep = -4.16384156+align +vbo
+	X_Ep = -11.8576929+align+vbo
+	M_Ese = -3.4284e-05+align +vbo
+	X_Ese = -6.47597587+align+vbo
+	
+	#bond lenght
+	d1=0.2693705751675323
+	d2=0.25546214420991864
+	d3=0.40676785939
+	d4=0.40676785939
+
+	permittivity = 7.63 * 8.854187e-12
+	
+	#bond sp3s* parameters
+	bondpar_1=np.array([-0.93130667,2.22314914 ,2.61254626,-0.15331669 , -0.54954328 ,-0.98540657,0.05314677 ])
+	bondpar_2=np.array([-5.54770615 ,3.99950805,5.69052071,0.86627316,-2.86642097,1.64593929 ,-1.58835950])
+	bondpar_3=np.array([ 0.39061482,-1.48804478,1.14395731,0.37779626,-0.78345347,0.03654274,-1.33815481])
+	bondpar_4=np.array([0.11543500,0.09023345, 0.80616394,-0.12486609,0.99023165 ,0.12371133,0.35250573])
+	bondpar_5=np.array([-0.48549629,1.01168223,  0.79508838 ,-0.13346246,-1.31549488,-1.94071508,0.94326900])
+
+	def __init__(self, vbo = 0.15, charge = 1.46861879):
+		self.vbo = vbo
+		self.charge = charge
+		self.M_Es = -0.29459962+self.align+vbo
+		self.X_Es = -17.6615209+self.align +vbo
+		self.M_Ep = -4.16384156+self.align +vbo
+		self.X_Ep = -11.8576929+self.align+vbo
+		self.M_Ese = -3.4284e-05+self.align +vbo
+		self.X_Ese = -6.47597587+self.align+vbo

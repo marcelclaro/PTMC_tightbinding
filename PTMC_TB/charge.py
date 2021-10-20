@@ -18,7 +18,7 @@ def getCharges(model,stack,insidegap):
 		chargeX2=6-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)
 		ldos = kpm.calc_ldos(energy=np.linspace(-30, insidegap, 4000), broadening=0.05,
 			position=[0, 0,0], sublattice="M2-"+str(n))
-		chargeM2=3-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)		
+		chargeM2=3-2*integrate.simps(np.nan_to_num(ldos.data),ldos.variable)	
 		charges.extend([chargeX1,chargeM1,chargeM2,chargeX2])
 	
 	return np.array(charges)
@@ -39,3 +39,11 @@ def electricfield(pos,stack,excesscharges):
         for p,zprime in enumerate(stack.planes):
             field[i]+=-0.5*sign(value-zprime)*excesscharges[p]*1.60217662e-19/(permittivity*area)
     return field
+
+def dipolecharge(a,material):
+	if material == 'GaSe':
+		return 0.3624+a*2.68
+	elif material == 'InSe':
+		return 0.1678+a*3.24623
+	elif material == 'GaS':
+		return -0.07383+a*4.0372
