@@ -1,0 +1,245 @@
+[[Fit Statistics]]
+    # fitting method   = Powell
+    # function evals   = 37189
+    # data points      = 5280
+    # variables        = 41
+    chi-square         = 6407.28005
+    reduced chi-square = 1.22299676
+    Akaike info crit   = 1103.72622
+    Bayesian info crit = 1373.16516
+##  Warning: uncertainties could not be estimated:
+[[Variables]]
+    M_Es:       -0.29459962 +/- 0.00219493 (0.75%) (init = -1.044758), model_value = -1.044758
+    X_Es:       -17.6615209 +/- 0.01859737 (0.11%) (init = -17.86918), model_value = -17.86918
+    M_Ep:       -4.16384156 +/-        nan (nan%) (init = -4.093269), model_value = -4.093269
+    X_Ep:       -11.8576929 +/- 0.00318697 (0.03%) (init = -11.86727), model_value = -11.86727
+    M_Ese:      -3.4284e-05 +/-        nan (nan%) (init = -0.19134), model_value = -0.19134
+    X_Ese:      -6.47597587 +/-        nan (nan%) (init = -6.042704), model_value = -6.042704
+    one_ss:     -0.93130667 +/-        nan (nan%) (init = -0.4627708), model_value = -0.4627708
+    one_sp:      2.22314914 +/- 0.00127860 (0.06%) (init = 2.150762), model_value = 2.150762
+    one_pp_s:    2.61254626 +/-        nan (nan%) (init = 2.720719), model_value = 2.720719
+    one_pp_p:   -0.15331669 +/- 0.00268181 (1.75%) (init = -0.07038455), model_value = -0.07038455
+    one_sep:    -0.54954328 +/- 0.00718513 (1.31%) (init = -0.5628826), model_value = -0.5628826
+    one_ses:    -0.98540657 +/-        nan (nan%) (init = -0.9510121), model_value = -0.9510121
+    one_sese:    0.05314677 +/- 9.4831e-04 (1.78%) (init = 0.1204713), model_value = 0.1204713
+    two_ss:     -5.54770615 +/- 0.00177832 (0.03%) (init = -3.999794), model_value = -3.999794
+    two_sp:      3.99950805 +/-        nan (nan%) (init = 3.856576), model_value = 3.856576
+    two_pp_s:    5.69052071 +/-        nan (nan%) (init = 5.82873), model_value = 5.82873
+    two_pp_p:    0.86627316 +/-        nan (nan%) (init = 0.7583264), model_value = 0.7583264
+    two_sep:    -2.86642097 +/-        nan (nan%) (init = -3.194538), model_value = -3.194538
+    two_ses:     1.64593929 +/-        nan (nan%) (init = 1.615834), model_value = 1.615834
+    two_sese:   -1.58835950 +/-        nan (nan%) (init = -1.487417), model_value = -1.487417
+    three_ss:    0.39061482 +/-        nan (nan%) (init = -0.09320003), model_value = -0.09320003
+    three_sp:   -1.48804478 +/- 0.01213532 (0.82%) (init = -1.541719), model_value = -1.541719
+    three_pp_s:  1.14395731 +/- 0.00101048 (0.09%) (init = 1.200924), model_value = 1.200924
+    three_pp_p:  0.37779626 +/- 0.00248689 (0.66%) (init = 0.423198), model_value = 0.423198
+    three_sep:  -0.78345347 +/- 0.00697803 (0.89%) (init = -0.6805037), model_value = -0.6805037
+    three_ses:   0.03654274 +/-        nan (nan%) (init = -0.00970535), model_value = -0.00970535
+    three_sese: -1.33815481 +/- 0.00154809 (0.12%) (init = -1.235023), model_value = -1.235023
+    four_ss:     0.11543500 +/- 0.00438654 (3.80%) (init = 0.05858501), model_value = 0.05858501
+    four_sp:     0.09023345 +/- 0.00523863 (5.81%) (init = 0.1820521), model_value = 0.1820521
+    four_pp_s:   0.80616394 +/-        nan (nan%) (init = 0.8586875), model_value = 0.8586875
+    four_pp_p:  -0.12486609 +/- 0.00209067 (1.67%) (init = -0.1261072), model_value = -0.1261072
+    four_sep:    0.99023165 +/-        nan (nan%) (init = 0.9182916), model_value = 0.9182916
+    four_ses:    0.12371133 +/- 0.00465821 (3.77%) (init = 0.09231899), model_value = 0.09231899
+    four_sese:   0.35250573 +/-        nan (nan%) (init = 0.4881728), model_value = 0.4881728
+    five_ss:    -0.48549629 +/- 0.00527616 (1.09%) (init = -0.4242335), model_value = -0.4242335
+    five_sp:     1.01168223 +/-        nan (nan%) (init = 1.091317), model_value = 1.091317
+    five_pp_s:   0.79508838 +/-        nan (nan%) (init = 0.8525206), model_value = 0.8525206
+    five_pp_p:  -0.13346246 +/- 0.00202300 (1.52%) (init = -0.1629898), model_value = -0.1629898
+    five_sep:   -1.31549488 +/- 0.00326985 (0.25%) (init = -1.3473), model_value = -1.3473
+    five_ses:   -1.94071508 +/-        nan (nan%) (init = -1.829443), model_value = -1.829443
+    five_sese:   0.94326900 +/- 0.00514233 (0.55%) (init = 1.007545), model_value = 1.007545
+[[Correlations]] (unreported correlations are < 0.100)
+    C(one_sp, three_pp_s)     = -18.722
+    C(one_sese, three_pp_s)   =  12.952
+    C(one_sp, one_sese)       =  11.717
+    C(three_pp_s, five_pp_p)  = -6.466
+    C(one_sp, one_pp_p)       = -6.028
+    C(two_ss, three_pp_s)     = -5.987
+    C(X_Ep, three_pp_s)       = -5.145
+    C(one_sese, five_pp_p)    =  4.756
+    C(one_sp, four_pp_p)      = -4.219
+    C(one_sep, three_pp_s)    =  3.920
+    C(one_sp, five_pp_p)      = -3.836
+    C(two_ss, five_sep)       = -3.575
+    C(three_pp_s, four_sp)    =  3.357
+    C(one_sese, two_ss)       =  3.304
+    C(one_sp, five_sese)      = -3.193
+    C(one_sep, one_sese)      = -3.003
+    C(one_sese, five_sep)     = -2.973
+    C(three_pp_s, five_sep)   =  2.833
+    C(one_sp, two_ss)         =  2.669
+    C(one_sp, four_sp)        = -2.619
+    C(M_Es, three_pp_s)       =  2.570
+    C(one_sese, four_sp)      =  2.455
+    C(one_sese, three_pp_p)   =  2.410
+    C(three_pp_s, four_ss)    =  2.367
+    C(two_ss, four_sp)        = -2.313
+    C(one_pp_p, three_pp_p)   = -2.203
+    C(one_sp, four_ses)       =  2.183
+    C(X_Ep, one_sese)         =  2.071
+    C(M_Es, X_Ep)             = -2.010
+    C(M_Es, two_ss)           = -1.945
+    C(M_Es, three_sese)       = -1.894
+    C(three_pp_s, four_ses)   = -1.881
+    C(one_sp, one_sep)        = -1.861
+    C(X_Ep, five_pp_p)        = -1.771
+    C(two_ss, four_pp_p)      = -1.709
+    C(one_sese, three_sese)   = -1.699
+    C(two_ss, four_ses)       =  1.659
+    C(three_pp_s, four_pp_p)  = -1.644
+    C(one_sese, four_ss)      = -1.628
+    C(two_ss, three_pp_p)     =  1.621
+    C(three_pp_p, four_sp)    = -1.490
+    C(one_pp_p, five_sep)     =  1.472
+    C(one_sep, two_ss)        = -1.464
+    C(X_Ep, one_sp)           = -1.446
+    C(one_sp, five_sep)       = -1.428
+    C(M_Es, three_sp)         = -1.395
+    C(one_sep, four_sp)       =  1.393
+    C(M_Es, one_pp_p)         =  1.380
+    C(three_pp_p, five_sese)  = -1.366
+    C(one_pp_p, five_sese)    = -1.357
+    C(one_sp, four_ss)        =  1.340
+    C(one_sese, four_pp_p)    =  1.316
+    C(three_sp, five_sese)    =  1.257
+    C(three_pp_p, five_ss)    =  1.237
+    C(M_Es, five_sese)        = -1.222
+    C(five_pp_p, five_sese)   = -1.215
+    C(one_pp_p, five_pp_p)    = -1.199
+    C(five_ss, five_sese)     = -1.187
+    C(four_sp, five_sep)      =  1.175
+    C(M_Es, three_pp_p)       =  1.146
+    C(three_pp_s, five_ss)    =  1.141
+    C(M_Es, three_sep)        =  1.093
+    C(two_ss, three_sese)     = -1.083
+    C(four_sp, four_ses)      = -1.053
+    C(three_sese, five_sese)  =  1.045
+    C(one_sese, three_sp)     =  1.037
+    C(four_pp_p, five_pp_p)   = -0.997
+    C(X_Es, one_sese)         =  0.989
+    C(X_Es, two_ss)           =  0.982
+    C(one_pp_p, four_pp_p)    =  0.973
+    C(X_Ep, three_pp_p)       = -0.960
+    C(four_ses, five_sep)     = -0.947
+    C(M_Es, four_pp_p)        = -0.946
+    C(one_pp_p, one_sep)      =  0.910
+    C(three_sep, five_sese)   = -0.897
+    C(one_sese, five_sese)    =  0.896
+    C(one_sep, five_sep)      =  0.860
+    C(three_sp, three_sep)    = -0.858
+    C(one_pp_p, three_sese)   =  0.857
+    C(four_ses, five_pp_p)    =  0.851
+    C(one_pp_p, one_sese)     =  0.845
+    C(five_pp_p, five_sep)    =  0.835
+    C(two_ss, five_pp_p)      = -0.815
+    C(M_Es, one_sese)         =  0.803
+    C(two_ss, five_ss)        =  0.803
+    C(X_Es, three_sp)         =  0.797
+    C(one_pp_p, two_ss)       = -0.795
+    C(one_sese, five_ss)      =  0.785
+    C(three_pp_s, three_sese) = -0.755
+    C(M_Es, one_sep)          =  0.726
+    C(five_ss, five_sep)      =  0.717
+    C(M_Es, four_ses)         =  0.704
+    C(one_sep, four_ses)      = -0.699
+    C(X_Es, four_ss)          = -0.691
+    C(X_Es, three_sep)        = -0.679
+    C(one_sep, five_pp_p)     =  0.672
+    C(one_sep, three_pp_p)    = -0.670
+    C(M_Es, four_sp)          =  0.667
+    C(one_sp, three_sep)      =  0.665
+    C(X_Es, four_sp)          = -0.662
+    C(one_pp_p, four_ss)      =  0.659
+    C(M_Es, five_ss)          =  0.647
+    C(one_pp_p, four_sp)      =  0.629
+    C(four_pp_p, five_sep)    =  0.612
+    C(one_sep, four_pp_p)     =  0.606
+    C(three_pp_p, five_sep)   =  0.597
+    C(one_sep, three_sp)      = -0.595
+    C(X_Es, three_pp_s)       =  0.593
+    C(three_pp_p, four_ss)    = -0.582
+    C(one_pp_p, three_pp_s)   =  0.581
+    C(three_sp, four_sp)      = -0.557
+    C(one_sese, three_sep)    = -0.551
+    C(three_sese, four_sp)    =  0.544
+    C(four_pp_p, four_ses)    = -0.541
+    C(three_sp, five_sep)     = -0.530
+    C(three_sese, five_sep)   = -0.525
+    C(X_Es, one_sep)          = -0.525
+    C(one_sep, four_ss)       =  0.515
+    C(X_Ep, four_ss)          =  0.509
+    C(three_sp, four_ss)      = -0.506
+    C(X_Es, three_sese)       =  0.504
+    C(four_sp, four_pp_p)     =  0.499
+    C(four_ss, four_sp)       =  0.488
+    C(three_pp_p, four_pp_p)  = -0.481
+    C(four_pp_p, five_ss)     = -0.474
+    C(M_Es, four_ss)          =  0.461
+    C(M_Es, five_sep)         = -0.452
+    C(three_sep, four_ss)     =  0.450
+    C(three_sese, five_ss)    = -0.446
+    C(X_Es, one_pp_p)         = -0.438
+    C(M_Es, one_sp)           = -0.430
+    C(three_sp, three_pp_s)   = -0.426
+    C(three_sp, five_ss)      = -0.423
+    C(X_Es, five_ss)          = -0.418
+    C(X_Ep, one_pp_p)         = -0.398
+    C(one_sp, three_pp_p)     =  0.393
+    C(one_sep, three_sep)     =  0.380
+    C(X_Ep, five_sese)        =  0.379
+    C(X_Ep, three_sep)        =  0.379
+    C(one_sp, three_sese)     =  0.367
+    C(X_Es, one_sp)           = -0.364
+    C(X_Ep, two_ss)           =  0.362
+    C(four_ses, five_ss)      =  0.360
+    C(one_pp_p, three_sep)    =  0.351
+    C(three_pp_p, five_pp_p)  =  0.350
+    C(four_sp, five_sese)     = -0.327
+    C(three_sep, four_ses)    =  0.325
+    C(three_sep, three_sese)  = -0.316
+    C(two_ss, five_sese)      = -0.312
+    C(X_Es, five_sese)        =  0.308
+    C(five_ss, five_pp_p)     = -0.307
+    C(two_ss, four_ss)        = -0.303
+    C(one_pp_p, four_ses)     = -0.295
+    C(X_Ep, one_sep)          = -0.287
+    C(three_sep, four_pp_p)   = -0.283
+    C(three_pp_s, three_sep)  = -0.281
+    C(X_Ep, four_ses)         =  0.267
+    C(one_sep, three_sese)    = -0.267
+    C(four_ss, five_ss)       =  0.266
+    C(four_ses, five_sese)    = -0.265
+    C(four_sp, five_ss)       =  0.254
+    C(one_sp, three_sp)       = -0.252
+    C(one_sep, five_ss)       =  0.248
+    C(X_Ep, five_ss)          = -0.239
+    C(three_sp, three_sese)   =  0.236
+    C(X_Ep, four_pp_p)        = -0.229
+    C(one_pp_p, three_sp)     = -0.227
+    C(four_pp_p, five_sese)   =  0.225
+    C(three_sp, four_ses)     = -0.224
+    C(three_sese, four_ses)   = -0.223
+    C(M_Es, five_pp_p)        =  0.202
+    C(three_sep, four_sp)     =  0.198
+    C(X_Es, four_pp_p)        =  0.193
+    C(three_sp, three_pp_p)   =  0.190
+    C(X_Es, four_ses)         = -0.162
+    C(two_ss, three_sp)       =  0.162
+    C(X_Ep, three_sese)       = -0.160
+    C(X_Es, X_Ep)             = -0.160
+    C(one_sp, five_ss)        = -0.159
+    C(three_sp, four_pp_p)    =  0.159
+    C(three_pp_s, three_pp_p) = -0.143
+    C(three_sep, five_ss)     =  0.134
+    C(three_sep, five_pp_p)   = -0.133
+    C(four_ss, five_sep)      =  0.133
+    C(four_ss, five_pp_p)     =  0.115
+    C(one_sep, five_sese)     =  0.112
+    C(X_Ep, five_sep)         =  0.111
+    C(three_sese, five_pp_p)  = -0.108
+    C(three_sp, five_pp_p)    =  0.108
+    C(three_pp_p, three_sep)  = -0.107
+    C(three_sep, five_sep)    = -0.106
+    C(four_ss, five_sese)     = -0.103
