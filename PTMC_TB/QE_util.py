@@ -1,6 +1,9 @@
 
 import numpy as np
 
+""" Tools to use QE output files
+"""
+
 """
 To include in the QE file:
 K_POINTS (crystal)
@@ -329,6 +332,7 @@ fullband_kpoints = np.array([[0.0000000000,0.0000000000,0.5000000000],
 		[0.3333300000,0.3333300000,0.0000000000]])
 fullband_index = (0,27,42,73,76,103,118,149,150,154,155,159)
 
+#get a standard list of point in usual kpath of hexagonal lattice
 def get_fullband_kpoints():
 	return np.copy(fullband_kpoints)
 
@@ -343,6 +347,8 @@ def loadBand(filename):
 		bands.append(z[i*numx:(i+1)*numx,1])
 	return bands
 
+#apply scissor operator in a band to correct the band
+#filled_states = number of filed states to identify the top of valence band, exp_gap = desired band 
 def apply_scissor(band,filled_states,exp_gap):
 	top_valence=np.max(band[filled_states - 1])
 	bottom_conduction=np.min(band[filled_states])

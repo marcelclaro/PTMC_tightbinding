@@ -3,6 +3,7 @@ from scipy import integrate
 import pybinding as pb
 from math import sin, pi
 
+#calculate charge using green function, insidegap parameter is a energy inside the band gap
 def getCharges(model,stack,insidegap):
 	charges = []
 	kpm = pb.kpm(model,silent=True)
@@ -31,6 +32,7 @@ def sign(value):
     else:
         return +1.0
 
+#calculate electric field based o excess charge, we use here parallel plane model (each atom form a plane in c direction)
 def electricfield(pos,stack,excesscharges):
     area = (stack.a*1e-9)**2*sin(pi*30/180)
     permittivity = stack.permittivity
@@ -40,6 +42,7 @@ def electricfield(pos,stack,excesscharges):
             field[i]+=-0.5*sign(value-zprime)*excesscharges[p]*1.60217662e-19/(permittivity*area)
     return field
 
+"""
 def dipolecharge(a,material):
 	if material == 'GaSe':
 		return 0.3624+a*2.68
@@ -47,3 +50,4 @@ def dipolecharge(a,material):
 		return 0.1678+a*3.24623
 	elif material == 'GaS':
 		return -0.07383+a*4.0372
+		"""

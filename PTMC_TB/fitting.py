@@ -1,14 +1,13 @@
 import numpy as np
 from .materials import PTMC
 
+#A material for fitting
 class material(PTMC):
 	#bond lenght
 	d1=0
 	d2=0
 	d3=0
 	d4=0
-
-	
 
 	def __init__(self,pars,a,c,z1,z2):
 		self.charge = 0

@@ -1,6 +1,6 @@
 from math import sqrt, pi, cos, sin
 
-"""Hopping projections
+"""Hopping projections depending on bond angle
 """
 def s_px(hopping,angle=(0,0)):
 	a=2*pi*angle[0]/360
@@ -56,7 +56,7 @@ def pzpz(h_sigma,h_pi,angle=(0,0)):
 def pzpy(h_sigma,h_pi,angle=(0,0)): 
 	return pypz(h_sigma,h_pi,angle)
 	
-
+#sp3s* hopping matrix
 def sp3s_hoppingmatrix(bondparameters,angle):
 	return [[bondparameters[0],s_px(bondparameters[1],angle),s_py(bondparameters[1],angle),s_pz(bondparameters[1],angle),bondparameters[5]],
 			[-s_px(bondparameters[1],angle),pxpx(bondparameters[2],bondparameters[3],angle),pxpy(bondparameters[2],bondparameters[3],angle),pxpz(bondparameters[2],bondparameters[3],angle),-s_px(bondparameters[4],angle)],
