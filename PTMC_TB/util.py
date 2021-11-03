@@ -1,9 +1,11 @@
 import numpy as np
 from math import pi
 
+#calculate distance between 2 atoms
 def distance(a1,a2,a3,pos1,pos2,cellpos2):
 	return  np.linalg.norm((cellpos2[0]*a1+cellpos2[1]*a2+cellpos2[2]*a3+pos2)-pos1)
 
+#calculate angle (phi in xy-plane and theta - with +z-axis) between 2 atoms
 def angles(a1,a2,a3,ref,pos1,pos2,cellpos2):
 	x=ref[0]*a1+ref[1]*a2+ref[2]*a3
 	x=x/np.linalg.norm(x)
