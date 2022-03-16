@@ -29,6 +29,7 @@ class Layer:
 		self.c = material.c
 		self.z1 = material.z1
 		self.z2 = material.z2
+		self.material = material
 		
 		#here define the starting position of the layer
 		self.zero=np.array([0,0,layerstart])
@@ -114,7 +115,7 @@ class Stack:
 			c += i.c
 		return c
 	
-	def __init__(self,materiallist, a,strained=True):
+	def __init__(self,materiallist, a,strained=False,potential=[]):
 
 		#read the list of materials, and check if is multiple of 3, because it is a R3m crystal
 		self.materiallist = materiallist
@@ -130,19 +131,23 @@ class Stack:
 		self.a2l=np.array([-a/2, (a/2) * sqrt(3),0]) 
 		self.a3l=np.array([0,0,self.c])
 		self.lat = pb.Lattice(a1=self.a1l.tolist(), a2=self.a2l.tolist(), a3=self.a3l.tolist())
+		self.unitcells = int(len(self.materiallist)/3)
+		self.VBMindex = int(self.unitcells*27-1)
+		self.CBMindex = int(self.unitcells*27)
 		
 		#dielectric permitivitty 
 		self.permittivity = 0
 		
-		#read the position of the planes and the defaut charge (if it is a bulk material)
+		#read the position of the planes and the defaut charge (like if it is a bulk material)
 		self.planes = []
+		self.atompositions = []
 		self.defaultcharge = []
+		self.potential = np.copy(potential)
 
 		#create the list of layers
 		for index,material in enumerate(self.materiallist):
 			self.layerlist.append(Layer(material,self.a,index,self.filled_c,strained=strained))
 			self.planes.extend([self.filled_c+material.z1,self.filled_c+material.z2,self.filled_c+material.c-material.z2,self.filled_c+material.c-material.z1])
-			self.defaultcharge.extend([-material.charge,material.charge,material.charge,-material.charge])
 			self.filled_c += material.c
 			self.permittivity += material.permittivity
 
@@ -151,7 +156,10 @@ class Stack:
 
 		#create a layer and setup the hopping matrix (without interlayer coupling)
 		for index,layer in enumerate(self.layerlist):
-			self.add_layer(layer,index)
+			if len(self.potential) != 0:
+				self.add_layer(layer,index,self.potential[index*4:index*4+4])
+			else:
+				self.add_layer(layer,index,[0,0,0,0])
 
 
 		#interlayer coupling hopping elements
@@ -189,30 +197,34 @@ class Stack:
 		
 		
 		
-	def add_layer(self,layer,index):
+	def add_layer(self,layer,index,potential):
 		#on-site/diagonal hopping elements
 		self.lat.add_sublattices(
-			('X1-'+str(index), layer.X1pos.tolist(), [[layer.X_Es,0,0,0,0],
-								[0,layer.X_Ep,0,0,0],
-								[0,0,layer.X_Ep,0,0],
-								[0,0,0,layer.X_Ep,0],
-								[0,0,0,0,layer.X_Ese]]),
-			('X2-'+str(index), layer.X2pos.tolist(), [[layer.X_Es,0,0,0,0],
-								[0,layer.X_Ep,0,0,0],
-								[0,0,layer.X_Ep,0,0],
-								[0,0,0,layer.X_Ep,0],
-								[0,0,0,0,layer.X_Ese]]),
-			('M1-'+str(index), layer.M1pos.tolist(), [[layer.M_Es,0,0,0,0],
-								[0,layer.M_Ep,0,0,0],
-								[0,0,layer.M_Ep,0,0],
-								[0,0,0,layer.M_Ep,0],
-								[0,0,0,0,layer.M_Ese]]),
-			('M2-'+str(index), layer.M2pos.tolist(), [[layer.M_Es,0,0,0,0],
-								[0,layer.M_Ep,0,0,0],
-								[0,0,layer.M_Ep,0,0],
-								[0,0,0,layer.M_Ep,0],
-								[0,0,0,0,layer.M_Ese]]),
+			('X1-'+str(index), layer.X1pos.tolist(), [[layer.X_Es+potential[0],0,0,0,0],
+								[0,layer.X_Ep+potential[0],0,0,0],
+								[0,0,layer.X_Ep+potential[0],0,0],
+								[0,0,0,layer.X_Ep+potential[0],0],
+								[0,0,0,0,layer.X_Ese+potential[0]]]),
+			('M1-'+str(index), layer.M1pos.tolist(), [[layer.M_Es+potential[1],0,0,0,0],
+								[0,layer.M_Ep+potential[1],0,0,0],
+								[0,0,layer.M_Ep+potential[1],0,0],
+								[0,0,0,layer.M_Ep+potential[1],0],
+								[0,0,0,0,layer.M_Ese+potential[1]]]),
+			('M2-'+str(index), layer.M2pos.tolist(), [[layer.M_Es+potential[2],0,0,0,0],
+								[0,layer.M_Ep+potential[2],0,0,0],
+								[0,0,layer.M_Ep+potential[2],0,0],
+								[0,0,0,layer.M_Ep+potential[2],0],
+								[0,0,0,0,layer.M_Ese+potential[2]]]),
+			('X2-'+str(index), layer.X2pos.tolist(), [[layer.X_Es+potential[3],0,0,0,0],
+								[0,layer.X_Ep+potential[3],0,0,0],
+								[0,0,layer.X_Ep+potential[3],0,0],
+								[0,0,0,layer.X_Ep+potential[3],0],
+								[0,0,0,0,layer.X_Ese+potential[3]]]),
 		)
+
+		#list with position of each atom
+		self.atompositions.extend([layer.X1pos.tolist(),layer.M1pos.tolist(),layer.M2pos.tolist(),layer.X2pos.tolist()])
+		self.defaultcharge.extend([-layer.material.charge,layer.material.charge,layer.material.charge,-layer.material.charge])
 
 		#off-diagonal elements of the layer, due to the symmetry it deppends on parity
 		if index % 3 == 0:

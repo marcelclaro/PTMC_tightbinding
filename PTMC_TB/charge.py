@@ -93,6 +93,7 @@ def getpotential_ewald(stack: Stack,charges,alpha,rcut,kcut):
 	
 	return vs
 
+""" Potential using direct sum (Slow convengence"""
 def getpotential_direct(stack: Stack,charges,rcut):
 	positions = np.array(stack.atompositions)
 	if len(positions) != len(charges):
