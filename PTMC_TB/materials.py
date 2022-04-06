@@ -22,6 +22,9 @@ class InSe(PTMC):
 	M_Ese = -0.00177680+align+vbo
 	X_Ese = -7.82566784+align+vbo
 
+	M_SOcoupling = 0
+	X_SOcoupling = 0
+
 	#bond lenght
 	d1=0.26580159178743173
 	d2=0.27881874425332515
@@ -62,6 +65,9 @@ class GaSe(PTMC):
 	M_Ese = -1.56830496
 	X_Ese = -7.75586591
 	
+	M_SOcoupling = 0.3
+	X_SOcoupling = 0.3
+
 	#bond lenght
 	d1=0.2452239643457275
 	d2=0.23434374187696183
@@ -97,6 +103,9 @@ class GaS(PTMC):
 	X_Ep = -13.6205020+align+vbo
 	M_Ese = -0.37864800+align +vbo
 	X_Ese = -2.0840e-04+align+vbo
+
+	M_SOcoupling = 0
+	X_SOcoupling = 0
 	
 	#bond lenght
 	d1=0.22960632000699166
@@ -139,6 +148,9 @@ class GaTe(PTMC):
 	X_Ep = -11.8576929+align+vbo
 	M_Ese = -3.4284e-05+align +vbo
 	X_Ese = -6.47597587+align+vbo
+
+	M_SOcoupling = 0
+	X_SOcoupling = 0
 	
 	#bond lenght
 	d1=0.2693705751675323
