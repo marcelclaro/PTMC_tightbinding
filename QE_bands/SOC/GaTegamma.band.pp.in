@@ -1,0 +1,5 @@
+&BANDS
+    prefix='GaTegamma'
+    outdir='/share/inl/marcel/TB-SO/GaTegamma_outdir'
+    filband ='GaTegamma.bands.dat'
+/

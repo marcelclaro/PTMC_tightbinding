@@ -1,6 +1,16 @@
 
 import numpy as np
 
+
+"""
+Spin-orbit
+JOURN A L O F RE SEA RCH of t oe Notional Bur ea u of Standards - A. Physics a nd Ch emist r y
+Vo l. 7SA, No .2, March - A pril 1971
+Table of Spin-Orbit Energies for p-Electrons
+in Neutral Atomic {core)np Configurations
+W. C. Martin"""
+
+
 class PTMC:
 	pass
 
@@ -22,8 +32,8 @@ class InSe(PTMC):
 	M_Ese = -0.00177680+align+vbo
 	X_Ese = -7.82566784+align+vbo
 
-	M_SOcoupling = 0
-	X_SOcoupling = 0
+	M_SOcoupling = 0.483
+	X_SOcoupling = 0.207
 
 	#bond lenght
 	d1=0.26580159178743173
@@ -65,8 +75,8 @@ class GaSe(PTMC):
 	M_Ese = -1.56830496
 	X_Ese = -7.75586591
 	
-	M_SOcoupling = 0.3
-	X_SOcoupling = 0.3
+	M_SOcoupling = 0.166
+	X_SOcoupling = 0.207
 
 	#bond lenght
 	d1=0.2452239643457275
@@ -104,8 +114,8 @@ class GaS(PTMC):
 	M_Ese = -0.37864800+align +vbo
 	X_Ese = -2.0840e-04+align+vbo
 
-	M_SOcoupling = 0
-	X_SOcoupling = 0
+	M_SOcoupling = 0.166
+	X_SOcoupling = 0.035
 	
 	#bond lenght
 	d1=0.22960632000699166
@@ -149,8 +159,8 @@ class GaTe(PTMC):
 	M_Ese = -3.4284e-05+align +vbo
 	X_Ese = -6.47597587+align+vbo
 
-	M_SOcoupling = 0
-	X_SOcoupling = 0
+	M_SOcoupling = 0.166
+	X_SOcoupling = 0.555
 	
 	#bond lenght
 	d1=0.2693705751675323

@@ -1,0 +1,24 @@
+#!/bin/sh
+#PBS -l nodes=4:ppn=12
+#PBS -l walltime=168:00:00
+#PBS -N PTMCgamma_tightbinding
+#PBS -M marcel.claro@inl.int
+
+module load intel
+module load openmpi-icc
+module load espresso-6.1
+module load fftw-gcc
+
+#cat $PBS_NODEFILE
+#cd $PBS_O_WORKDIR
+
+PBS_O_WORKDIR=/home/mclaro/TB-SO
+cd $PBS_O_WORKDIR
+mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in GaSegamma_relax.in > GaSegamma_relax.out
+mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in InSegamma_relax.in > InSegamma_relax.out
+mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in InTegamma_relax.in > InTegamma_relax.out
+mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in GaSgamma_relax.in > GaSgamma_relax.out
+mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in GaTegamma_relax.in > GaTegamma_relax.out
+
+
+

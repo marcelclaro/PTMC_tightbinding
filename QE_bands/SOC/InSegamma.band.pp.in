@@ -1,0 +1,5 @@
+&BANDS
+    prefix='InSegamma'
+    outdir='/share/inl/marcel/TB-SO/InSegamma_outdir'
+    filband ='InSegamma.bands.dat'
+/

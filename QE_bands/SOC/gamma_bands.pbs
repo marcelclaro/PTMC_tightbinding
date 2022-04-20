@@ -1,0 +1,28 @@
+#!/bin/sh
+#PBS -l nodes=4:ppn=12
+#PBS -l walltime=4:00:00
+#PBS -N PTMCgamma_tightbinding
+#PBS -M marcel.claro@inl.int
+
+module load intel
+module load openmpi-icc
+module load espresso-6.1
+module load fftw-gcc
+
+#cat $PBS_NODEFILE
+#cd $PBS_O_WORKDIR
+
+PBS_O_WORKDIR=/home/mclaro/TB-SO
+cd $PBS_O_WORKDIR
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in GaSgamma_band.in > GaSgamma_band.out
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore bands.x -in GaSgamma.band.pp.in > GaSgamma.band.pp.out
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in InTegamma_band.in > InTegamma_band.out
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore bands.x -in InTegamma.band.pp.in > InTegamma.band.pp.out
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in GaTegamma_band.in > GaTegamma_band.out
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore bands.x -in GaTegamma.band.pp.in > GaTegamma.band.pp.out
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in GaSegamma_band.in > GaSegamma_band.out
+#mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore bands.x -in GaSegamma.band.pp.in > GaSegamma.band.pp.out
+mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore pw.x -in InSegamma_band.in > InSegamma_band.out
+mpirun --wdir $PBS_O_WORKDIR -x OMP_NUM_THREADS=1 --bind-to-core --bycore bands.x -in InSegamma.band.pp.in > InSegamma.band.pp.out
+
+

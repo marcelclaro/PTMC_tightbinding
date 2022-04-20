@@ -1,0 +1,5 @@
+&BANDS
+    prefix='GaSegamma'
+    outdir='/share/inl/marcel/TB-SO/GaSegamma_outdir'
+    filband ='GaSegamma.bands.dat'
+/

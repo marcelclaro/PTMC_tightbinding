@@ -1,0 +1,62 @@
+&control
+    calculation = 'scf'
+    prefix = 'GaSegamma'
+    outdir = '/share/inl/marcel/TB-SO/GaSegamma_outdir'
+    pseudo_dir = '/home/mclaro/pseudo/ONCVPSP/sg15'
+    etot_conv_thr = 1e-6
+    forc_conv_thr = 4e-4
+    verbosity     = 'high'
+/
+&system
+    ibrav=0, A= 3.761889524  
+    nat = 12
+    ntyp = 2
+    ecutwfc=150,
+    ecutrho=600,
+    input_dft = 'sla+pw+psx+psc'
+    occupations = 'fixed',
+    
+        !SOC
+    noncolin = .TRUE.
+    lspinorb = .TRUE.
+    starting_magnetization(1) = 0
+    starting_magnetization(2) = 0
+   
+/
+&electrons
+    conv_thr=7e-10
+    mixing_mode      = 'plain'
+    mixing_beta      = 0.7
+/
+&ions
+/
+&cell
+    cell_dofree='all'
+/
+
+CELL_PARAMETERS {alat}
+  1.000000000000000   0.000000000000000   0.000000000000000 
+ -0.500000000000000   0.866025403784439   0.000000000000000 
+  0.000000000000001   0.000000000000001   6.280908685 
+
+ATOMIC_SPECIES
+  Ga   69.72300  Ga_ONCV_PBE_fr.upf
+  Se   78.96000  Se_ONCV_PBE_fr.upf
+
+ATOMIC_POSITIONS (crystal)
+Se       0.000000000   0.000000000   0.235247106
+Se       0.333333333   0.666666667   0.097774734
+Se       0.666666667   0.333333333   0.568555057
+Se      -0.000000000  -0.000000000   0.431132162
+Se       0.333333333   0.666666667   0.901900883
+Se       0.666666667   0.333333333   0.764446115
+Ga       0.666666667   0.333333333   0.283398030
+Ga      -0.000000000  -0.000000000   0.049590081
+Ga       0.333333333   0.666666667   0.616701227
+Ga       0.666666667   0.333333333   0.382950886
+Ga       0.000000000   0.000000000   0.950045183
+Ga       0.333333333   0.666666667   0.716258537
+
+K_POINTS (automatic)
+  15 15 5 0 0 0
+
